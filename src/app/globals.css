@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-paper font-sans text-ink antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+::selection {
+  background: #d9f26b;
+  color: #111412;
+}
+
+/* Grain léger façon papier imprimé */
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-ink-500;
+  }
+  .eyebrow::before {
+    content: '';
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-citron-500;
+  }
+  .on-dark .eyebrow {
+    @apply text-paper/60;
+  }
+
+  .h-display {
+    @apply font-display font-normal leading-[0.95] tracking-[-0.02em];
+  }
+
+  /* Surlignage « citation » : le mot entouré d'astérisques dans l'admin */
+  .mark {
+    font-style: italic;
+    background-image: linear-gradient(transparent 62%, #d9f26b 62%, #d9f26b 90%, transparent 90%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0 0.08em;
+    margin: 0 -0.04em;
+  }
+  .on-dark .mark {
+    color: #d9f26b;
+    background-image: none;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[15px] font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:-translate-y-0.5 hover:bg-ink-800 hover:shadow-[0_10px_30px_-10px_rgba(17,20,18,0.6)];
+  }
+  .btn-citron {
+    @apply btn bg-citron text-ink hover:-translate-y-0.5 hover:bg-citron-300;
+  }
+  .btn-ghost {
+    @apply btn border border-ink/15 text-ink hover:border-ink/40 hover:bg-ink/[0.03];
+  }
+  .on-dark .btn-ghost {
+    @apply border-paper/20 text-paper hover:border-paper/50 hover:bg-paper/5;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-paper/15 bg-paper/[0.04] px-4 py-3.5 text-[15px] text-paper placeholder:text-paper/35 outline-none transition focus:border-citron focus:bg-paper/[0.07];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ——— Espace administrateur ——— */
+@layer components {
+  .adm-card {
+    @apply rounded-2xl border border-ink/10 bg-white/70;
+  }
+  .adm-label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink-700;
+  }
+  .adm-help {
+    @apply mt-1.5 text-[12.5px] text-ink-500;
+  }
+  .adm-input {
+    @apply w-full rounded-lg border border-ink/15 bg-white px-3.5 py-2.5 text-[15px] text-ink outline-none transition placeholder:text-ink-400 focus:border-ink focus:ring-4 focus:ring-citron/60;
+  }
+  .adm-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50;
+  }
+  .adm-btn-primary {
+    @apply adm-btn bg-ink text-paper hover:bg-ink-700;
+  }
+  .adm-btn-ghost {
+    @apply adm-btn border border-ink/15 bg-white text-ink hover:border-ink/40;
+  }
+  .adm-btn-danger {
+    @apply adm-btn border border-red-200 bg-white text-red-700 hover:bg-red-50;
+  }
+  .adm-icon-btn {
+    @apply grid h-8 w-8 place-items-center rounded-md text-ink-500 transition-colors hover:bg-ink/5 hover:text-ink disabled:pointer-events-none disabled:opacity-30;
+  }
+}
