@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { Collection } from '@/lib/collections';
+import { enName, type Collection } from '@/lib/collections';
 
 type Row = Record<string, unknown> & { id: string; published: boolean };
 type Finder = {
@@ -23,6 +23,7 @@ export async function getFormValues(collection: Collection, id: string) {
   for (const f of collection.fields) {
     const v = item[f.name];
     values[f.name] = v instanceof Date ? v.toISOString().slice(0, 10) : (v as string | number | boolean | null);
+    if (f.translatable) values[enName(f.name)] = (item[enName(f.name)] as string | null) ?? '';
   }
   return values;
 }
@@ -36,6 +37,7 @@ export function defaultValues(collection: Collection) {
     else if (f.type === 'select') values[f.name] = f.options?.[0]?.value ?? '';
     else if (f.name === 'ctaLabel') values[f.name] = 'Demander un devis';
     else values[f.name] = f.type === 'checkbox' ? false : '';
+    if (f.translatable) values[enName(f.name)] = f.name === 'ctaLabel' ? 'Request a quote' : '';
   }
   return values;
 }

@@ -1,11 +1,28 @@
 import { prisma } from '@/lib/prisma';
-import { frTypo, getPublicContent } from '@/lib/content';
+import { getPublicContent, typo } from '@/lib/content';
+import { COLLECTIONS, enName, type Collection } from '@/lib/collections';
+import type { Locale } from '@/lib/i18n';
 
 const ordered = { orderBy: [{ position: 'asc' as const }, { createdAt: 'asc' as const }] };
 
-export async function getSiteData() {
+// Remplace chaque champ traduisible par sa version anglaise quand elle existe,
+// puis applique la typographie de la langue.
+function localize<T extends object>(rows: T[], model: Collection['model'], locale: Locale): T[] {
+  const translatable = COLLECTIONS.find((c) => c.model === model)!.fields.filter((f) => f.translatable);
+  return rows.map((row) => {
+    const out = { ...row } as Record<string, unknown>;
+    for (const f of translatable) {
+      const en = out[enName(f.name)];
+      if (locale === 'en' && typeof en === 'string' && en.trim()) out[f.name] = en;
+      if (typeof out[f.name] === 'string') out[f.name] = typo(out[f.name] as string, locale);
+    }
+    return out as T;
+  });
+}
+
+export async function getSiteData(locale: Locale) {
   const [content, services, steps, plans, faqs, reviews] = await Promise.all([
-    getPublicContent(),
+    getPublicContent(locale),
     prisma.service.findMany({ where: { published: true }, ...ordered }),
     prisma.step.findMany({ where: { published: true }, ...ordered }),
     prisma.plan.findMany({ where: { published: true }, ...ordered }),
@@ -15,19 +32,12 @@ export async function getSiteData() {
       orderBy: [{ featured: 'desc' }, { position: 'asc' }, { date: 'desc' }],
     }),
   ]);
-  // Applique la typographie française aux textes saisis dans l'admin.
-  const typo = <T extends object>(rows: T[]) =>
-    rows.map((row) =>
-      Object.fromEntries(
-        Object.entries(row).map(([k, v]) => [k, typeof v === 'string' && !/url|Url|source|id/.test(k) ? frTypo(v) : v]),
-      ) as T,
-    );
   return {
     content,
-    services: typo(services),
-    steps: typo(steps),
-    plans: typo(plans),
-    faqs: typo(faqs),
-    reviews: typo(reviews),
+    services: localize(services, 'service', locale),
+    steps: localize(steps, 'step', locale),
+    plans: localize(plans, 'plan', locale),
+    faqs: localize(faqs, 'faqItem', locale),
+    reviews: localize(reviews, 'review', locale),
   };
 }

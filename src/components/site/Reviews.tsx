@@ -6,14 +6,10 @@ import Reveal from './Reveal';
 import Stars from './Stars';
 import TrustBox from './TrustBox';
 import { Arrow } from './Icons';
+import { getDictionary, type Locale } from '@/lib/i18n';
 
-const SOURCE_LABEL: Record<string, string> = {
-  trustpilot: 'Trustpilot',
-  google: 'Google',
-  direct: 'Témoignage',
-};
-
-export default function Reviews({ c, reviews }: { c: SiteContent; reviews: Review[] }) {
+export default function Reviews({ c, reviews, locale }: { c: SiteContent; reviews: Review[]; locale: Locale }) {
+  const t = getDictionary(locale);
   const score = parseFloat(c.trustpilot_score.replace(',', '.')) || 5;
 
   return (
@@ -41,12 +37,12 @@ export default function Reviews({ c, reviews }: { c: SiteContent; reviews: Revie
                   <span className="font-display text-5xl leading-none">{c.trustpilot_score}</span>
                   <span className="text-ink-500">/ 5</span>
                 </p>
-                <p className="mt-2 text-sm text-ink-500">Basé sur {c.trustpilot_count} avis</p>
+                <p className="mt-2 text-sm text-ink-500">{t.basedOn(c.trustpilot_count)}</p>
               </div>
               <div className="flex flex-col items-end gap-4">
                 <Stars rating={score} size={22} />
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 group-hover:text-ink">
-                  Voir les avis <Arrow className="transition-transform group-hover:translate-x-0.5" />
+                  {t.seeReviews} <Arrow className="transition-transform group-hover:translate-x-0.5" />
                 </span>
               </div>
             </a>
@@ -76,7 +72,7 @@ export default function Reviews({ c, reviews }: { c: SiteContent; reviews: Revie
                     r.featured ? 'text-paper/50' : 'text-ink-400'
                   }`}
                 >
-                  {SOURCE_LABEL[r.source] ?? r.source}
+                  {t.sourceLabels[r.source] ?? r.source}
                 </span>
               </div>
               {r.title && <h3 className="mt-5 text-lg font-semibold">{r.title}</h3>}
@@ -97,7 +93,7 @@ export default function Reviews({ c, reviews }: { c: SiteContent; reviews: Revie
                 <div className="min-w-0 flex-1 text-sm">
                   <p className="font-semibold">{r.author}</p>
                   <p className={r.featured ? 'text-paper/55' : 'text-ink-500'}>
-                    {[r.role, r.company].filter(Boolean).join(', ') || formatDate(r.date)}
+                    {[r.role, r.company].filter(Boolean).join(', ') || formatDate(r.date, locale)}
                   </p>
                 </div>
                 {r.url && (
@@ -107,7 +103,7 @@ export default function Reviews({ c, reviews }: { c: SiteContent; reviews: Revie
                     rel="noopener noreferrer"
                     className={`text-xs underline underline-offset-4 ${r.featured ? 'text-paper/60' : 'text-ink-500'}`}
                   >
-                    Voir l’avis
+                    {t.seeReview}
                   </a>
                 )}
               </div>

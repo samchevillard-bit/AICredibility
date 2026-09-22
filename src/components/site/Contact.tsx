@@ -1,9 +1,11 @@
 import type { SiteContent } from '@/lib/content';
+import { getDictionary, type Locale } from '@/lib/i18n';
 import ContactForm from './ContactForm';
 import Emph from './Emph';
 import Reveal from './Reveal';
 
-export default function Contact({ c }: { c: SiteContent }) {
+export default function Contact({ c, locale }: { c: SiteContent; locale: Locale }) {
+  const t = getDictionary(locale);
   return (
     <section id="contact" className="scroll-mt-16 px-3 pb-3 sm:px-5 sm:pb-5">
       <div className="on-dark relative overflow-hidden rounded-[32px] bg-ink py-20 text-paper sm:py-28">
@@ -20,7 +22,7 @@ export default function Contact({ c }: { c: SiteContent }) {
             <p className="mt-6 max-w-[48ch] text-lg leading-relaxed text-paper/65">{c.contact_text}</p>
             <dl className="mt-10 space-y-4 text-[15px]">
               <div className="flex gap-4">
-                <dt className="w-20 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/40 pt-1">Email</dt>
+                <dt className="w-20 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/40 pt-1">{t.contactLabels.email}</dt>
                 <dd>
                   <a href={`mailto:${c.contact_email}`} className="underline decoration-paper/30 underline-offset-4 hover:decoration-citron">
                     {c.contact_email}
@@ -29,7 +31,7 @@ export default function Contact({ c }: { c: SiteContent }) {
               </div>
               {c.contact_phone && (
                 <div className="flex gap-4">
-                  <dt className="w-20 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/40 pt-1">Tél.</dt>
+                  <dt className="w-20 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/40 pt-1">{t.contactLabels.phone}</dt>
                   <dd>
                     <a href={`tel:${c.contact_phone.replace(/\s/g, '')}`} className="hover:text-citron">
                       {c.contact_phone}
@@ -39,14 +41,14 @@ export default function Contact({ c }: { c: SiteContent }) {
               )}
               {c.contact_city && (
                 <div className="flex gap-4">
-                  <dt className="w-20 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/40 pt-1">Zone</dt>
+                  <dt className="w-20 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/40 pt-1">{t.contactLabels.zone}</dt>
                   <dd>{c.contact_city}</dd>
                 </div>
               )}
             </dl>
           </Reveal>
           <Reveal delay={120}>
-            <ContactForm success={c.contact_success} />
+            <ContactForm success={c.contact_success} locale={locale} />
           </Reveal>
         </div>
       </div>

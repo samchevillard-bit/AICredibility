@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { getCollection, type Collection } from '@/lib/collections';
+import { enName, getCollection, type Collection } from '@/lib/collections';
 import { requireAdmin } from '@/lib/actions/guard';
 
 export type ItemFormState = { error?: string };
@@ -62,6 +62,15 @@ function parseForm(collection: Collection, formData: FormData) {
       default:
         data[field.name] = str || (field.required ? str : null);
     }
+  }
+  // Versions anglaises : jamais obligatoires, vides = on affiche le français.
+  for (const field of collection.fields.filter((f) => f.translatable)) {
+    const raw = formData.get(enName(field.name));
+    const str = typeof raw === 'string' ? raw.replace(/\r\n/g, '\n').trim() : '';
+    data[enName(field.name)] =
+      field.type === 'lines'
+        ? str.split('\n').map((l) => l.trim()).filter(Boolean).join('\n') || null
+        : str || null;
   }
   return data;
 }

@@ -54,8 +54,8 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
         </div>
       </aside>
       <main className="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:px-12 lg:py-12">
-        <div className="mx-auto max-w-5xl">{children}</div>
-        <div className="mx-auto mt-12 flex max-w-5xl gap-2 border-t border-ink/10 pt-6 lg:hidden">
+        <div className="mx-auto max-w-6xl">{children}</div>
+        <div className="mx-auto mt-12 flex max-w-6xl gap-2 border-t border-ink/10 pt-6 lg:hidden">
           <Link href="/" target="_blank" className="adm-btn-ghost">Voir le site ↗</Link>
           <form action={logoutAction}>
             <button type="submit" className="adm-btn-ghost">Déconnexion</button>

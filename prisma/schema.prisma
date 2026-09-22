@@ -2,12 +2,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// SQLite en local (zéro configuration). Pour la production sur Vercel, passez
-// le provider à "postgresql" et renseignez DATABASE_URL (Neon, Supabase…) :
-// les modifications faites dans l'admin seront alors conservées durablement.
+// Base Postgres (Neon, Supabase, Vercel Postgres…).
+// DATABASE_URL : connexion « poolée » utilisée par le site.
+// DATABASE_URL_UNPOOLED : connexion directe utilisée par les migrations.
+// L'intégration Neon de Vercel crée ces deux variables automatiquement.
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model AdminUser {
@@ -20,42 +22,57 @@ model AdminUser {
 
 // Textes éditables du site (clé -> valeur). Les valeurs par défaut vivent
 // dans src/lib/content.ts ; seules les modifications sont stockées ici.
+// Clé nue = français, « en:clé » = anglais.
 model Setting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
 }
 
+// Les champs suffixés « En » contiennent la version anglaise ; vides, le
+// site anglais affiche le texte français.
 model Service {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  bullets     String   @default("") // une puce par ligne
-  position    Int      @default(0)
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  titleEn       String?
+  description   String
+  descriptionEn String?
+  bullets       String   @default("") // une puce par ligne
+  bulletsEn     String?
+  position      Int      @default(0)
+  published     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Step {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  duration    String?
-  position    Int      @default(0)
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  titleEn       String?
+  description   String
+  descriptionEn String?
+  duration      String?
+  durationEn    String?
+  position      Int      @default(0)
+  published     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Plan {
   id          String   @id @default(cuid())
   name        String
+  nameEn      String?
   price       String
+  priceEn     String?
   period      String?
+  periodEn    String?
   tagline     String?
+  taglineEn   String?
   features    String   @default("") // une ligne par avantage
+  featuresEn  String?
   ctaLabel    String   @default("Demander un devis")
+  ctaLabelEn  String?
   highlighted Boolean  @default(false)
   position    Int      @default(0)
   published   Boolean  @default(true)
@@ -64,13 +81,15 @@ model Plan {
 }
 
 model FaqItem {
-  id        String   @id @default(cuid())
-  question  String
-  answer    String
-  position  Int      @default(0)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  question   String
+  questionEn String?
+  answer     String
+  answerEn   String?
+  position   Int      @default(0)
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Review {
@@ -78,9 +97,12 @@ model Review {
   author    String
   company   String?
   role      String?
+  roleEn    String?
   rating    Int      @default(5)
   title     String?
+  titleEn   String?
   content   String
+  contentEn String?
   source    String   @default("trustpilot") // trustpilot | google | direct
   url       String?
   avatarUrl String?
@@ -99,6 +121,7 @@ model Lead {
   company   String?
   website   String?
   message   String
+  locale    String   @default("fr")
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }

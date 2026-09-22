@@ -16,6 +16,6 @@ export function initials(name: string) {
     .join('');
 }
 
-export function formatDate(date: Date) {
-  return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+export function formatDate(date: Date, locale: 'fr' | 'en' = 'fr') {
+  return new Intl.DateTimeFormat(locale === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 }

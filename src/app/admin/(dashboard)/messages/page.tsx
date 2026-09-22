@@ -29,6 +29,9 @@ export default async function MessagesPage() {
                     )}
                     {l.name}
                     {l.company && <span className="font-normal text-ink-500">· {l.company}</span>}
+                    <span className="rounded border border-ink/15 px-1.5 py-0.5 font-mono text-[10px] font-normal uppercase text-ink-500">
+                      {l.locale}
+                    </span>
                   </p>
                   <p className="mt-1 flex flex-wrap gap-x-4 text-sm text-ink-500">
                     <a href={`mailto:${l.email}`} className="underline underline-offset-4 hover:text-ink">

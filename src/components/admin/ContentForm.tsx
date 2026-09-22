@@ -13,45 +13,76 @@ function Save() {
   );
 }
 
+type Values = { fr: Record<string, string>; en: Record<string, string> };
+
+function Input({ field, name, value }: { field: ContentField; name: string; value: string }) {
+  return field.type === 'textarea' ? (
+    <textarea
+      id={name}
+      name={name}
+      defaultValue={value}
+      rows={Math.min(12, Math.max(3, Math.ceil(value.length / 45) + 1))}
+      className="adm-input resize-y leading-relaxed"
+    />
+  ) : (
+    <input
+      id={name}
+      name={name}
+      type={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'}
+      defaultValue={value}
+      className="adm-input"
+    />
+  );
+}
+
+function Badge({ lang }: { lang: 'FR' | 'EN' }) {
+  return (
+    <span className={`rounded px-1.5 py-px font-mono text-[10px] ${lang === 'FR' ? 'bg-ink text-paper' : 'bg-citron text-ink'}`}>
+      {lang}
+    </span>
+  );
+}
+
 export default function ContentForm({
   groupId,
   fields,
   values,
+  defaults,
 }: {
   groupId: string;
   fields: ContentField[];
-  values: Record<string, string>;
+  values: Values;
+  defaults: Values;
 }) {
   const [state, action] = useFormState<SaveState, FormData>(saveContentGroup.bind(null, groupId), {});
 
   return (
-    <form action={action} className="space-y-6" key={groupId}>
+    <form action={action} className="space-y-7" key={groupId}>
       {fields.map((f) => {
-        const modified = values[f.key] !== f.default;
+        const modified =
+          values.fr[f.key] !== defaults.fr[f.key] || (!f.shared && values.en[f.key] !== defaults.en[f.key]);
         return (
           <div key={f.key}>
-            <div className="flex items-baseline justify-between gap-3">
-              <label htmlFor={f.key} className="adm-label">
+            <div className="mb-1.5 flex items-baseline justify-between gap-3">
+              <span className="text-[13px] font-semibold text-ink-700">
                 {f.label}
-              </label>
+                {f.shared && <span className="ml-2 font-normal text-ink-400">(toutes langues)</span>}
+              </span>
               {modified && <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-citron-600">Modifié</span>}
             </div>
-            {f.type === 'textarea' ? (
-              <textarea
-                id={f.key}
-                name={f.key}
-                defaultValue={values[f.key]}
-                rows={Math.min(10, Math.max(3, Math.ceil(values[f.key].length / 80)))}
-                className="adm-input resize-y leading-relaxed"
-              />
+            {f.shared ? (
+              <Input field={f} name={f.key} value={values.fr[f.key]} />
             ) : (
-              <input
-                id={f.key}
-                name={f.key}
-                type={f.type === 'email' ? 'email' : f.type === 'url' ? 'url' : 'text'}
-                defaultValue={values[f.key]}
-                className="adm-input"
-              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="block">
+                  <span className="mb-1 flex"><Badge lang="FR" /></span>
+                  <Input field={f} name={f.key} value={values.fr[f.key]} />
+                </label>
+                <label className="block">
+                  <span className="mb-1 flex"><Badge lang="EN" /></span>
+                  <Input field={f} name={`en:${f.key}`} value={values.en[f.key]} />
+                </label>
+              </div>
             )}
             {f.help && <p className="adm-help">{f.help}</p>}
           </div>

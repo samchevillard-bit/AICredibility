@@ -22,7 +22,13 @@ export type CollectionField = {
   placeholder?: string;
   options?: { value: string; label: string }[];
   half?: boolean;
+  /** Champ traduisible : l'admin affiche aussi une version anglaise (« nomEn »). */
+  translatable?: boolean;
 };
+
+export function enName(name: string) {
+  return `${name}En`;
+}
 
 export type CollectionSlug = 'avis' | 'expertises' | 'methode' | 'offres' | 'faq';
 
@@ -62,12 +68,19 @@ export const COLLECTIONS: Collection[] = [
     fields: [
       { name: 'author', label: 'Nom de l’auteur', type: 'text', required: true, half: true },
       { name: 'company', label: 'Entreprise', type: 'text', half: true },
-      { name: 'role', label: 'Fonction', type: 'text', half: true },
+      { name: 'role', label: 'Fonction', type: 'text', half: true, translatable: true },
       { name: 'source', label: 'Source', type: 'select', options: REVIEW_SOURCES, half: true },
       { name: 'rating', label: 'Note', type: 'rating', half: true },
       { name: 'date', label: 'Date de l’avis', type: 'date', half: true },
-      { name: 'title', label: 'Titre de l’avis', type: 'text' },
-      { name: 'content', label: 'Texte de l’avis', type: 'textarea', required: true },
+      { name: 'title', label: 'Titre de l’avis', type: 'text', translatable: true },
+      {
+        name: 'content',
+        label: 'Texte de l’avis',
+        type: 'textarea',
+        required: true,
+        translatable: true,
+        help: 'La traduction anglaise est optionnelle : sans elle, le site anglais affiche l’avis original.',
+      },
       {
         name: 'url',
         label: 'Lien vers l’avis original',
@@ -88,9 +101,9 @@ export const COLLECTIONS: Collection[] = [
     titleField: 'title',
     subtitleField: 'description',
     fields: [
-      { name: 'title', label: 'Titre', type: 'text', required: true },
-      { name: 'description', label: 'Description', type: 'textarea', required: true },
-      { name: 'bullets', label: 'Points clés', type: 'lines', help: 'Un point par ligne.' },
+      { name: 'title', label: 'Titre', type: 'text', required: true, translatable: true },
+      { name: 'description', label: 'Description', type: 'textarea', required: true, translatable: true },
+      { name: 'bullets', label: 'Points clés', type: 'lines', help: 'Un point par ligne.', translatable: true },
       published,
     ],
   },
@@ -103,9 +116,9 @@ export const COLLECTIONS: Collection[] = [
     titleField: 'title',
     subtitleField: 'description',
     fields: [
-      { name: 'title', label: 'Titre', type: 'text', required: true, half: true },
-      { name: 'duration', label: 'Durée', type: 'text', placeholder: 'Ex. Semaines 1 à 2', half: true },
-      { name: 'description', label: 'Description', type: 'textarea', required: true },
+      { name: 'title', label: 'Titre', type: 'text', required: true, translatable: true },
+      { name: 'duration', label: 'Durée', type: 'text', placeholder: 'Ex. Semaines 1 à 2', translatable: true },
+      { name: 'description', label: 'Description', type: 'textarea', required: true, translatable: true },
       published,
     ],
   },
@@ -118,12 +131,12 @@ export const COLLECTIONS: Collection[] = [
     titleField: 'name',
     subtitleField: 'price',
     fields: [
-      { name: 'name', label: 'Nom de la formule', type: 'text', required: true, half: true },
-      { name: 'tagline', label: 'Accroche', type: 'text', half: true },
-      { name: 'price', label: 'Prix', type: 'text', required: true, placeholder: 'Ex. 1 490 €', half: true },
-      { name: 'period', label: 'Période', type: 'text', placeholder: 'Ex. / mois', half: true },
-      { name: 'features', label: 'Inclus', type: 'lines', help: 'Un avantage par ligne.' },
-      { name: 'ctaLabel', label: 'Texte du bouton', type: 'text', half: true },
+      { name: 'name', label: 'Nom de la formule', type: 'text', required: true, translatable: true },
+      { name: 'tagline', label: 'Accroche', type: 'text', translatable: true },
+      { name: 'price', label: 'Prix', type: 'text', required: true, placeholder: 'Ex. 1 490 €', translatable: true },
+      { name: 'period', label: 'Période', type: 'text', placeholder: 'Ex. / mois', translatable: true },
+      { name: 'features', label: 'Inclus', type: 'lines', help: 'Un avantage par ligne.', translatable: true },
+      { name: 'ctaLabel', label: 'Texte du bouton', type: 'text', translatable: true },
       { name: 'highlighted', label: 'Formule recommandée', type: 'checkbox', half: true },
       published,
     ],
@@ -137,8 +150,8 @@ export const COLLECTIONS: Collection[] = [
     titleField: 'question',
     subtitleField: 'answer',
     fields: [
-      { name: 'question', label: 'Question', type: 'text', required: true },
-      { name: 'answer', label: 'Réponse', type: 'textarea', required: true },
+      { name: 'question', label: 'Question', type: 'text', required: true, translatable: true },
+      { name: 'answer', label: 'Réponse', type: 'textarea', required: true, translatable: true },
       published,
     ],
   },

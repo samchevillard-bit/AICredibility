@@ -1,11 +1,23 @@
 import type { Plan } from '@prisma/client';
 import type { SiteContent } from '@/lib/content';
+import { getDictionary, type Locale } from '@/lib/i18n';
 import { lines } from '@/lib/site';
 import Emph from './Emph';
 import Reveal from './Reveal';
 import { Arrow, Check } from './Icons';
 
-export default function Pricing({ c, plans, ctaHref }: { c: SiteContent; plans: Plan[]; ctaHref: string }) {
+export default function Pricing({
+  c,
+  plans,
+  ctaHref,
+  locale,
+}: {
+  c: SiteContent;
+  plans: Plan[];
+  ctaHref: string;
+  locale: Locale;
+}) {
+  const t = getDictionary(locale);
   return (
     <section id="offres" className="scroll-mt-16 py-24 sm:py-32">
       <div className="container-x">
@@ -30,7 +42,7 @@ export default function Pricing({ c, plans, ctaHref }: { c: SiteContent; plans: 
             >
               {p.highlighted && (
                 <span className="absolute right-6 top-6 rounded-full bg-citron px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
-                  Recommandée
+                  {t.recommended}
                 </span>
               )}
               <h3 className="font-display text-[34px] leading-none">{p.name}</h3>

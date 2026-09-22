@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { saveItem, type ItemFormState } from '@/lib/actions/collections';
-import type { CollectionField } from '@/lib/collections';
+import { enName, type CollectionField } from '@/lib/collections';
 
 type Values = Record<string, string | number | boolean | null>;
 
@@ -41,8 +41,17 @@ function RatingInput({ name, initial }: { name: string; initial: number }) {
   );
 }
 
-function Field({ field, value }: { field: CollectionField; value: Values[string] }) {
+function Field({
+  field,
+  value,
+  lang,
+}: {
+  field: CollectionField;
+  value: Values[string];
+  lang?: 'FR' | 'EN';
+}) {
   const id = `f-${field.name}`;
+  const required = field.required && lang !== 'EN';
   const str = value === null || value === undefined ? '' : String(value);
 
   if (field.type === 'checkbox') {
@@ -63,7 +72,7 @@ function Field({ field, value }: { field: CollectionField; value: Values[string]
           id={id}
           name={field.name}
           defaultValue={str}
-          required={field.required}
+          required={required}
           rows={field.type === 'lines' ? 5 : 5}
           placeholder={field.placeholder}
           className="adm-input resize-y leading-relaxed"
@@ -91,7 +100,7 @@ function Field({ field, value }: { field: CollectionField; value: Values[string]
           name={field.name}
           type={field.type === 'date' ? 'date' : field.type === 'url' ? 'url' : field.type === 'number' ? 'number' : 'text'}
           defaultValue={str}
-          required={field.required}
+          required={required}
           placeholder={field.placeholder}
           className="adm-input"
         />
@@ -100,12 +109,17 @@ function Field({ field, value }: { field: CollectionField; value: Values[string]
 
   return (
     <div>
-      <label htmlFor={id} className="adm-label">
+      <label htmlFor={id} className="adm-label flex items-center gap-2">
+        {lang && (
+          <span className={`rounded px-1.5 py-px font-mono text-[10px] ${lang === 'FR' ? 'bg-ink text-paper' : 'bg-citron text-ink'}`}>
+            {lang}
+          </span>
+        )}
         {field.label}
-        {field.required && <span className="text-ink-400"> *</span>}
+        {required && <span className="text-ink-400"> *</span>}
       </label>
       {control}
-      {field.help && <p className="adm-help">{field.help}</p>}
+      {field.help && lang !== 'FR' && <p className="adm-help">{field.help}</p>}
     </div>
   );
 }
@@ -126,11 +140,22 @@ export default function ItemForm({
   return (
     <form action={action} className="adm-card bg-paper-50 p-6">
       <div className="grid gap-5 sm:grid-cols-2">
-        {fields.map((f) => (
-          <div key={f.name} className={f.half ? '' : 'sm:col-span-2'}>
-            <Field field={f} value={values[f.name]} />
-          </div>
-        ))}
+        {fields.map((f) =>
+          f.translatable ? (
+            <div key={f.name} className="grid gap-4 rounded-xl border border-ink/10 bg-white/50 p-4 sm:col-span-2 md:grid-cols-2">
+              <Field field={f} value={values[f.name]} lang="FR" />
+              <Field
+                field={{ ...f, name: enName(f.name), placeholder: f.placeholder ? undefined : 'Vide = texte français' }}
+                value={values[enName(f.name)]}
+                lang="EN"
+              />
+            </div>
+          ) : (
+            <div key={f.name} className={f.half ? '' : 'sm:col-span-2'}>
+              <Field field={f} value={values[f.name]} />
+            </div>
+          ),
+        )}
       </div>
       {state.error && (
         <p className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">

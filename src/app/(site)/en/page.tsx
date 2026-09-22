@@ -1,9 +1,9 @@
 import HomePage, { homeMetadata } from '@/components/site/HomePage';
 
 export function generateMetadata() {
-  return homeMetadata('fr');
+  return homeMetadata('en');
 }
 
 export default function Page() {
-  return <HomePage locale="fr" />;
+  return <HomePage locale="en" />;
 }

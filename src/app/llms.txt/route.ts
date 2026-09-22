@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 // Résumé du site au format llms.txt, pensé pour les agents et moteurs d'IA.
 export async function GET() {
-  const { content: c, services, plans, faqs } = await getSiteData();
+  const { content: c, services, plans, faqs } = await getSiteData('fr');
   const out = [
     `# ${c.brand_name}`,
     '',
@@ -26,6 +26,7 @@ export async function GET() {
     `- Email : ${c.contact_email}`,
     c.contact_phone ? `- Téléphone : ${c.contact_phone}` : '',
     `- Site : ${siteUrl}`,
+    `- English version: ${siteUrl}/en`,
     c.trustpilot_url ? `- Avis Trustpilot : ${c.trustpilot_url} (${c.trustpilot_score}/5, ${c.trustpilot_count} avis)` : '',
   ]
     .filter((l) => l !== undefined)

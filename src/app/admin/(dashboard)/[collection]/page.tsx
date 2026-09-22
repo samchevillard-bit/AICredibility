@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCollection, REVIEW_SOURCES } from '@/lib/collections';
+import { enName, getCollection, REVIEW_SOURCES } from '@/lib/collections';
 import { listItems } from '@/lib/collection-data';
 import { deleteItem, moveItem, togglePublished } from '@/lib/actions/collections';
 import PageHeader from '@/components/admin/PageHeader';
@@ -46,6 +46,10 @@ export default async function CollectionPage({
             const title = String(item[collection.titleField] ?? '');
             const subtitle = collection.subtitleField ? String(item[collection.subtitleField] ?? '') : '';
             const isReview = collection.model === 'review';
+            // Traduction complète si chaque champ obligatoire traduisible a sa version anglaise.
+            const translated = collection.fields
+              .filter((f) => f.translatable && f.required)
+              .every((f) => String(item[enName(f.name)] ?? '').trim());
             return (
               <li key={item.id} className={`flex items-center gap-3 px-3 py-3 sm:px-4 ${item.published ? '' : 'bg-ink/[0.025]'}`}>
                 <div className="flex flex-col">
@@ -73,6 +77,16 @@ export default async function CollectionPage({
                       <span className="rounded bg-ink/5 px-1.5 py-0.5 font-mono text-[10px] font-normal uppercase tracking-wider text-ink-500">
                         {REVIEW_SOURCES.find((s) => s.value === item.source)?.label ?? String(item.source)}
                       </span>
+                    )}
+                    {!isReview && (
+                    <span
+                      className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-normal uppercase tracking-wider ${
+                        translated ? 'bg-ink/5 text-ink-500' : 'border border-dashed border-ink/25 text-ink-400'
+                      }`}
+                      title={translated ? 'Version anglaise renseignée' : 'Pas encore traduit : le site anglais affiche le français'}
+                    >
+                      {translated ? 'EN ✓' : 'EN à traduire'}
+                    </span>
                     )}
                     {Boolean(item.featured) && (
                       <span className="rounded bg-citron px-1.5 py-0.5 font-mono text-[10px] font-normal uppercase tracking-wider">

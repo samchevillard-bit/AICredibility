@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { Spark } from './Icons';
+import { getDictionary, type Locale } from '@/lib/i18n';
 
 const ENGINES = ['ChatGPT', 'Perplexity', 'Gemini', 'Claude'];
-const SOURCES = ['Votre site', 'Article de presse', 'Avis clients'];
 
 type Phase = 'typing' | 'thinking' | 'answering' | 'done';
 
-export default function AiAnswer({ prompt, answer }: { prompt: string; answer: string }) {
+export default function AiAnswer({ prompt, answer, locale }: { prompt: string; answer: string; locale: Locale }) {
+  const t = getDictionary(locale);
   const words = answer.split(/(\s+)/);
   const [engine, setEngine] = useState(0);
   const [phase, setPhase] = useState<Phase>('typing');
@@ -72,7 +73,7 @@ export default function AiAnswer({ prompt, answer }: { prompt: string; answer: s
       <div className="absolute -inset-6 -z-10 rounded-[40px] bg-[radial-gradient(closest-side,rgba(217,242,107,0.55),transparent)] blur-2xl" />
       <div className="overflow-hidden rounded-[22px] border border-ink/10 bg-paper-50 shadow-[0_40px_80px_-40px_rgba(17,20,18,0.45),0_2px_0_rgba(255,255,255,0.8)_inset]">
         <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3">
-          <div className="flex gap-1" role="tablist" aria-label="Moteur d’IA simulé">
+          <div className="flex gap-1" role="tablist" aria-label={t.engineTabs}>
             {ENGINES.map((name, i) => (
               <button
                 key={name}
@@ -88,7 +89,7 @@ export default function AiAnswer({ prompt, answer }: { prompt: string; answer: s
               </button>
             ))}
           </div>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-ink-400 sm:block">Simulation</span>
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-ink-400 sm:block">{t.simulation}</span>
         </div>
 
         <div className="space-y-5 p-5 sm:p-7">
@@ -103,7 +104,7 @@ export default function AiAnswer({ prompt, answer }: { prompt: string; answer: s
             </span>
             <div className="min-h-[168px] flex-1 text-[15px] leading-relaxed text-ink-700">
               {phase === 'thinking' && (
-                <span className="inline-flex gap-1 pt-2" aria-label="Réflexion en cours">
+                <span className="inline-flex gap-1 pt-2" aria-label={t.thinking}>
                   {[0, 1, 2].map((d) => (
                     <span
                       key={d}
@@ -116,7 +117,7 @@ export default function AiAnswer({ prompt, answer }: { prompt: string; answer: s
               {(phase === 'answering' || phase === 'done') && <p>{answerNodes}</p>}
               {phase === 'done' && (
                 <div className="mt-4 flex flex-wrap gap-2 animate-rise">
-                  {SOURCES.map((s, i) => (
+                  {t.sources.map((s, i) => (
                     <span
                       key={s}
                       className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-paper px-2.5 py-1 font-mono text-[11px] text-ink-500"

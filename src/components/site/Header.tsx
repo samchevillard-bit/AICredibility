@@ -3,16 +3,31 @@
 import { useEffect, useState } from 'react';
 import Logo from './Logo';
 import { Arrow } from './Icons';
+import { getDictionary, localePrefix, type Locale } from '@/lib/i18n';
 
-const NAV = [
-  { href: '#expertises', label: 'Expertises' },
-  { href: '#methode', label: 'Méthode' },
-  { href: '#avis', label: 'Avis' },
-  { href: '#offres', label: 'Offres' },
-  { href: '#faq', label: 'FAQ' },
-];
-
-export default function Header({ brand, cta, ctaHref }: { brand: string; cta: string; ctaHref: string }) {
+export default function Header({
+  brand,
+  cta,
+  ctaHref,
+  locale,
+  alternateHref,
+}: {
+  brand: string;
+  cta: string;
+  ctaHref: string;
+  locale: Locale;
+  alternateHref: string;
+}) {
+  const t = getDictionary(locale);
+  const home = localePrefix(locale) || '/';
+  const NAV = [
+    { href: `${home}#expertises`, label: t.nav.services },
+    { href: `${home}#methode`, label: t.nav.method },
+    { href: `${home}#avis`, label: t.nav.reviews },
+    { href: `${home}#offres`, label: t.nav.pricing },
+    { href: `${home}#faq`, label: t.nav.faq },
+  ];
+  const other = locale === 'fr' ? 'en' : 'fr';
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -30,10 +45,10 @@ export default function Header({ brand, cta, ctaHref }: { brand: string; cta: st
       }`}
     >
       <div className="container-x flex h-[68px] items-center justify-between gap-6">
-        <a href="#top" aria-label={`${brand}, accueil`} onClick={() => setOpen(false)}>
+        <a href={home} aria-label={`${brand}, ${t.home}`} onClick={() => setOpen(false)}>
           <Logo name={brand} />
         </a>
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Navigation principale">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label={t.mainNav}>
           {NAV.map((item) => (
             <a
               key={item.href}
@@ -45,6 +60,7 @@ export default function Header({ brand, cta, ctaHref }: { brand: string; cta: st
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <LangSwitch locale={locale} other={other} href={alternateHref} />
           <a href={ctaHref} className="btn-primary hidden !py-2.5 !text-[14px] sm:inline-flex">
             {cta}
             <Arrow />
@@ -53,7 +69,7 @@ export default function Header({ brand, cta, ctaHref }: { brand: string; cta: st
             type="button"
             className="grid h-11 w-11 place-items-center rounded-full border border-ink/15 lg:hidden"
             aria-expanded={open}
-            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-label={open ? t.closeMenu : t.openMenu}
             onClick={() => setOpen((v) => !v)}
           >
             <span className="relative block h-3 w-4">
@@ -68,7 +84,7 @@ export default function Header({ brand, cta, ctaHref }: { brand: string; cta: st
         </div>
       </div>
       {open && (
-        <nav className="container-x flex flex-col pb-6 lg:hidden" aria-label="Navigation mobile">
+        <nav className="container-x flex flex-col pb-6 lg:hidden" aria-label={t.mainNav}>
           {NAV.map((item) => (
             <a
               key={item.href}
@@ -85,5 +101,24 @@ export default function Header({ brand, cta, ctaHref }: { brand: string; cta: st
         </nav>
       )}
     </header>
+  );
+}
+
+function LangSwitch({ locale, other, href }: { locale: Locale; other: Locale; href: string }) {
+  return (
+    <div className="flex items-center rounded-full border border-ink/15 p-1 font-mono text-[11px] uppercase">
+      <span className="rounded-full bg-ink px-2.5 py-1.5 text-paper" aria-current="true">
+        {locale}
+      </span>
+      <a
+        href={href}
+        hrefLang={other}
+        lang={other}
+        className="rounded-full px-2.5 py-1.5 text-ink-500 transition-colors hover:text-ink"
+        title={getDictionary(other).switchTo}
+      >
+        {other}
+      </a>
+    </div>
   );
 }

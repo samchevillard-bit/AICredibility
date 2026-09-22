@@ -1,10 +1,12 @@
 import type { SiteContent } from '@/lib/content';
+import { getDictionary, type Locale } from '@/lib/i18n';
 import AiAnswer from './AiAnswer';
 import Emph from './Emph';
 import Stars from './Stars';
 import { Arrow } from './Icons';
 
-export default function Hero({ c, ctaHref }: { c: SiteContent; ctaHref: string }) {
+export default function Hero({ c, ctaHref, locale }: { c: SiteContent; ctaHref: string; locale: Locale }) {
+  const t = getDictionary(locale);
   const score = parseFloat(c.trustpilot_score.replace(',', '.')) || 5;
 
   return (
@@ -40,13 +42,13 @@ export default function Hero({ c, ctaHref }: { c: SiteContent; ctaHref: string }
           >
             <Stars rating={score} size={18} />
             <span>
-              <strong className="font-semibold text-ink">{c.trustpilot_score}/5</strong> sur Trustpilot ·{' '}
-              {c.trustpilot_count} avis
+              <strong className="font-semibold text-ink">{c.trustpilot_score}/5</strong> {t.onTrustpilot} ·{' '}
+              {t.reviewsCount(c.trustpilot_count)}
             </span>
           </a>
         </div>
         <div className="animate-rise [animation-delay:200ms]">
-          <AiAnswer prompt={c.hero_prompt} answer={c.hero_answer} />
+          <AiAnswer prompt={c.hero_prompt} answer={c.hero_answer} locale={locale} />
         </div>
       </div>
     </section>
